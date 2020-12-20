@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 
 using namespace std;
 
@@ -11,7 +11,7 @@ class Kredyt {
         double dlug;
         int pozostale_raty;
     public:
-        Kredyt(double kwota, int czas_splaty) {
+        Kredyt(double kwota, int czas_splaty) {//kwota-kwota kredytu
             dlug = kwota;
             pozostale_raty = czas_splaty;
         }
@@ -53,19 +53,23 @@ class Inz :public Pracownik {
         string wydzial;
     public:
         static int CI;//stala wydajnosci
-        void print() { std::cout << "inz " << imie <<", wydzial: "<<wydzial<<endl;}
-        int pensja() { return 500; };
+        void print() { cout << "inz " << imie <<", wydzial: "<<wydzial<<endl;}
+        int pensja() { 
+            return 450;// returnuje wartosc z gory zalozonej pensji  
+        };
         Inz(string nowe_imie, string wydzial) : Pracownik(nowe_imie) { this->wydzial = wydzial; }
 };
-int Inz::CI = 500;
+int Inz::CI = 300;
 
 class Mkt :public Pracownik {
     private:
         int follows;
     public:
         static int Cmkt;//stala wydajnosci
-        void print() { std::cout << "Mkt " << imie << ", follows: " << follows << endl; }
-        int pensja() { return 400; };
+        void print() { cout << "Mkt " << imie << ", follows: " << follows << endl; }
+        int pensja() { 
+            return 400; // returnuje wartosc z gory zalozonej pensji  
+        };
         Mkt(string nowe_imie, int follows) : Pracownik(nowe_imie) { this->follows = follows; }
 };
 int Mkt::Cmkt = 125;
@@ -75,8 +79,10 @@ class Mag :public Pracownik {
         bool obsl_widl;
     public:
         static int CMag;//stala wydajnosci
-        void print() { ::cout << "Mag " << imie << ", obsl_widl: " << obsl_widl<< endl; }//override
-        int pensja() { return 250; };
+        void print() { cout << "Mag " << imie << ", obsl_widl: " << obsl_widl<< endl; }//override
+        int pensja() { 
+            return 250; // returnuje wartosc z gory zalozonej pensji  
+        };
         Mag(string nowe_imie, bool obsl_widl) : Pracownik(nowe_imie) { this->obsl_widl = obsl_widl; }
 };
 int Mag:: CMag = 150;
@@ -86,15 +92,17 @@ class Rob:public Pracownik {
         double but;
     public:
         static int CRob;//stala wydajnosci
-        void print() { ::cout << "Rob " << imie << ", but: " << but << endl; }//override
-        int pensja() { return 300; };
+        void print() { cout << "Rob " << imie << ", but: " << but << endl; }//override
+        int pensja() { 
+            return 300; // returnuje wartosc z gory zalozonej pensji  
+        };
         Rob(string nowe_imie, double but) : Pracownik(nowe_imie) { this->but = but; }
 };
 int Rob::CRob = 75;
 
 class Firma {
     private:
-        static const int Kwota_poczatkowa;       
+               
         double stan_konta;
         int n_kredytow; int pojemnosc_kredyty;
         Kredyt* tab_kredytow; 
@@ -105,7 +113,8 @@ class Firma {
         int gdzie_wstawiac_przychod;
         
     public:
-                
+
+        static const int Kwota_poczatkowa;
         Firma() {
             pojemnosc_kredyty = 4;
             pojemnosc_prac = 4;
@@ -115,7 +124,7 @@ class Firma {
             tab_prac = new Pracownik *[pojemnosc_prac];
             stan_konta = Kwota_poczatkowa;
             gdzie_wstawiac_przychod = 0;
-            for (int i = 0; i < N; i++) {//zesujemy poczatkowo wartosc firmy w kazdym miesiacu
+            for (int i = 0; i < N; i++) {//zerujemy poczatkowa wartosc firmy w kazdym miesiacu
                 historia_przych[i] = 0;
             }
         }
@@ -149,7 +158,6 @@ class Firma {
                 pojemnosc_kredyty = pojemnosc_kredyty * 2;
             }
             stan_konta += kwota;//kwota kredytu;
-            
         }
             
         void zatrudnij(Pracownik* nowy_prac) {
@@ -238,10 +246,11 @@ class Firma {
         }
 
         template <typename Rodzaj_pracowanika>
+
         int licznik_pracownikow() {
             int licznik_prac=0;
             for (int i = 0; i < n_prac; i++) {
-                Rodzaj_pracowanika* prac = dynamic_cast <Rodzaj_pracowanika*> (tab_prac[i]);//rzutowanie inzynierow na pracownika
+                Rodzaj_pracowanika* prac = dynamic_cast <Rodzaj_pracowanika*> (tab_prac[i]);//rzutowanie rodzajow pracownikow na pracownika
                 if(prac!=0 ){
                     licznik_prac ++;
                 }
@@ -271,6 +280,11 @@ class Firma {
             }
             return suma_zadluzenia;
         }
+
+        ~Firma() { 
+            delete[] tab_prac;
+            delete[] tab_kredytow; 
+        }
 };
 
 const int Firma:: Kwota_poczatkowa = 50;//inicjacja zmiennej statycznej
@@ -279,15 +293,15 @@ class Gra {
     private:
         bool stan;
         Firma* firma;
-
         void tick() {
             firma->otrzymaj_przychod();
             firma->zaplac_wynagrodzenie();
             firma->splac_raty();
         }
+
     public:
 
-        Gra() { firma = new Firma; };//domyslny konstruktor
+        Gra() { firma = new Firma; };
 
         bool akcja_gracza() {
             string komenda;
@@ -379,10 +393,6 @@ class Gra {
         }
 
         void stan_poczatkowy() {
-            string imie, wydzial;
-            int follows;
-            double but;
-            bool obsl_widl;
             Inz* inzynier = new Inz("Kamil", "MEiL");
             firma->zatrudnij(inzynier);
             Mkt* marketer = new Mkt("Marek", 48);
@@ -392,6 +402,8 @@ class Gra {
             Rob* robotnik = new Rob("Robert", 46.5);
             firma->zatrudnij(robotnik);
 
+            Firma:: Kwota_poczatkowa;
+            cout << endl <<"kwota poczatkowa: "<< firma->Kwota_poczatkowa<<endl;
             firma->drukuj_pracownikow();
             }
 
@@ -417,6 +429,9 @@ class Gra {
                 cout << "blad";
                 return;
             }
+        }
+        ~Gra() {
+            delete firma;
         }
 };
 
